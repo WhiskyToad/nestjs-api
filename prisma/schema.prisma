@@ -25,7 +25,7 @@ model User {
 
 
 
-@@map("users")
+  @@map("users")
 }
 
 model Task {
@@ -39,5 +39,5 @@ model Task {
   userId Int
   user User @relation(fields: [userId], references: [id])
 
-@@map("tasks")
+  @@map("tasks")
   }
