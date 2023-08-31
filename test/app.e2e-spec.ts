@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import * as pactum from 'pactum';
 import { AuthDto } from '../src/auth/dto';
 import { EditUserDto } from 'src/user/dto/edit-user.dto';
+import { CreateTaskDto, EditTaskDto } from 'src/task/dto';
 
 describe('App e2e', () => {
   let app: INestApplication;
@@ -121,20 +122,86 @@ describe('App e2e', () => {
     });
   });
   describe('Task', () => {
-    describe('create task', () => {
-      //TODO
+    describe('get empty tasks', () => {
+      it('should get tasks', () => {
+        return pactum
+          .spec()
+          .get('/tasks')
+          .withHeaders({ Authorization: 'Bearer $S{userAt}' })
+          .expectStatus(200)
+          .expectBody([]);
+      });
     });
+    describe('create task', () => {
+      it('should create a task', () => {
+        const dto: CreateTaskDto = {
+          title: 'first task',
+        };
+
+        return pactum
+          .spec()
+          .post('/tasks')
+          .withHeaders({ Authorization: 'Bearer $S{userAt}' })
+          .withBody(dto)
+          .expectStatus(201)
+          .expectBodyContains(dto.title)
+          .stores('taskId', 'id');
+      });
+    });
+
     describe('get tasks', () => {
-      //TODO
+      it('should get tasks', () => {
+        return pactum
+          .spec()
+          .get('/tasks')
+          .withHeaders({ Authorization: 'Bearer $S{userAt}' })
+          .expectStatus(200)
+          .expectJsonLength(1);
+      });
     });
     describe('get task by id', () => {
-      //TODO
+      it('should get task by id', () => {
+        return pactum
+          .spec()
+          .get('/tasks/{id}')
+          .withPathParams('id', '$S{taskId}')
+          .withHeaders({ Authorization: 'Bearer $S{userAt}' })
+          .expectStatus(200)
+          .expectBodyContains('$S{taskId}');
+      });
     });
     describe('edit task by id', () => {
-      //TODO
+      const dto: EditTaskDto = {
+        title: 'new title who dis',
+      };
+      it('should edit task by id', () => {
+        return pactum
+          .spec()
+          .patch('/tasks/{id}')
+          .withPathParams('id', '$S{taskId}')
+          .withHeaders({ Authorization: 'Bearer $S{userAt}' })
+          .withBody(dto)
+          .expectStatus(200)
+          .expectBodyContains(dto.title);
+      });
     });
     describe('delete task by id', () => {
-      //TODO
+      it('should delete task by id', () => {
+        return pactum
+          .spec()
+          .delete('/tasks/{id}')
+          .withPathParams('id', '$S{taskId}')
+          .withHeaders({ Authorization: 'Bearer $S{userAt}' })
+          .expectStatus(204);
+      });
+      it('should get empty tasks', () => {
+        return pactum
+          .spec()
+          .get('/tasks')
+          .withHeaders({ Authorization: 'Bearer $S{userAt}' })
+          .expectStatus(200)
+          .expectBody([]);
+      });
     });
   });
 });
